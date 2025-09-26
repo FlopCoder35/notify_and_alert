@@ -1,0 +1,42 @@
+/* Clean light theme with high contrast */
+:root {
+  --bg: #f8fafc;
+  --surface: #ffffff;
+  --border: #e5e7eb;
+  --primary: #0d6efd; /* Bootstrap primary */
+  --text: #0f172a;    /* slate-900 */
+  --text-muted: #475569; /* slate-600 */
+}
+
+body { background-color: var(--bg); color: var(--text); }
+.navbar { background-color: var(--surface) !important; border-bottom: 1px solid var(--border); }
+.navbar .nav-link, .navbar .navbar-brand { color: var(--text) !important; }
+.navbar .btn.btn-light { background: var(--primary); border: none; color: #fff !important; }
+
+.hero { background: linear-gradient(135deg, #e3f2ff, #ffffff); color: var(--text); }
+.card { background-color: var(--surface); color: var(--text); border: 1px solid var(--border); }
+.card-title { font-weight: 600; }
+.table { color: var(--text); }
+.table thead { color: var(--text); }
+.list-group-item { background-color: var(--surface); color: var(--text); border-color: var(--border); }
+.alert { background-color: #eef6ff; color: #0c2d6b; border: 1px solid #cfe2ff; }
+.btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
+.btn-outline-secondary { color: var(--text); border-color: var(--border); }
+.btn-outline-secondary:hover { background: #f1f5f9; color: var(--text); }
+.navbar-brand { font-weight: 700; }
+.badge.text-uppercase { letter-spacing: .04em; }
+
+/* Severity badges with readable colors */
+.badge-info { background: #0ea5e9; color: #fff; }
+.badge-warning { background: #f59e0b; color: #111827; }
+.badge-critical { background: #ef4444; color: #fff; }
+
+/* Links */
+a, .nav-link { color: var(--primary); }
+a:hover, .nav-link:hover { color: #0b5ed7; }
+
+/* Forms */
+input, select, textarea { background: #ffffff !important; color: var(--text) !important; border: 1px solid var(--border) !important; }
+label { color: var(--text-muted); }
+
+

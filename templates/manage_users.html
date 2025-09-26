@@ -2,16 +2,39 @@
 {% block title %}Manage Users{% endblock %}
 {% block content %}
 <div class="row">
-  <div class="col-md-4">
-    <div class="card mb-3"><div class="card-body">
+  <div class="col-md-5">
+    <div class="card mb-3 shadow-sm"><div class="card-body">
       <h5 class="card-title">Add User</h5>
-      <form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary">Create</button></form>
-      <small class="text-muted">Default password: password</small>
+      <form method="post" class="row g-3">
+        {% csrf_token %}
+        <div class="col-md-6">
+          <label class="form-label">Username</label>
+          {{ form.username }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Email</label>
+          {{ form.email }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Team</label>
+          {{ form.team }}
+        </div>
+        <div class="col-md-3 form-check mt-4 ms-2">
+          {{ form.is_staff }} <label class="form-check-label">Staff</label>
+        </div>
+        <div class="col-md-3 form-check mt-4">
+          {{ form.is_superuser }} <label class="form-check-label">Superuser</label>
+        </div>
+        <div class="col-12">
+          <button class="btn btn-primary"><i class="bi bi-person-plus me-1"></i>Create</button>
+          <small class="text-muted ms-2">Default password: password</small>
+        </div>
+      </form>
     </div></div>
   </div>
-  <div class="col-md-8">
+  <div class="col-md-7">
     <h5>Users</h5>
-    <table class="table table-striped">
+    <table class="table table-striped table-hover shadow-sm">
       <thead><tr><th>Username</th><th>Email</th><th>Team</th><th>Staff</th></tr></thead>
       <tbody>
         {% for u in users %}

@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from .models import Alert, NotificationDelivery, UserAlertPreference
 from .serializers import (
     AlertSerializer,
+    AlertAdminListSerializer,
     MarkReadSerializer,
     SnoozeSerializer,
     UserAlertPreferenceSerializer,
@@ -26,6 +27,33 @@ class AlertViewSet(viewsets.ModelViewSet):
     serializer_class = AlertSerializer
     permission_classes = [IsAdminOrReadOnly]
     filterset_fields = ["severity", "archived", "reminders_enabled", "visibility"]
+
+    def get_serializer_class(self):
+        if self.action == 'list' and self.request and self.request.user and self.request.user.is_staff:
+            return AlertAdminListSerializer
+        return super().get_serializer_class()
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        status_param = self.request.query_params.get('status')
+        if status_param == 'active':
+            qs = [a for a in qs if a.is_active_now]
+        elif status_param == 'expired':
+            qs = [a for a in qs if not a.is_active_now]
+        # annotate metrics for admin list
+        from django.db.models import Count, Q
+        from django.utils import timezone as tz
+        today = tz.localdate()
+        return (
+            Alert.objects.filter(id__in=[a.id for a in qs])
+            .annotate(
+                num_preferences=Count('user_preferences', distinct=True),
+                num_read=Count('user_preferences', filter=Q(user_preferences__is_read=True), distinct=True),
+                num_unread=Count('user_preferences', filter=Q(user_preferences__is_read=False), distinct=True),
+                num_snoozed_today=Count('user_preferences', filter=Q(user_preferences__snoozed_on=today), distinct=True),
+            )
+            .order_by('-created_at')
+        )
 
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAdminUser])
     def deliver_now(self, request, pk=None):

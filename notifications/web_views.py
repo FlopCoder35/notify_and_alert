@@ -1,15 +1,21 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required, user_passes_test
+from django.contrib.auth import logout as auth_logout
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 
-from .forms import AlertForm, TeamForm, UserForm
+from .forms import AlertForm, TeamForm, AdminUserForm
 from .models import Alert, Team, User, UserAlertPreference
 from .services import deliver_alert
 
 
 def home(request):
     return render(request, "home.html")
+
+
+def logout_to_home(request):
+    auth_logout(request)
+    return redirect("home")
 
 
 @login_required
@@ -71,27 +77,30 @@ def manage_teams(request):
 @staff_required
 def manage_users(request):
     if request.method == "POST":
-        form = UserForm(request.POST)
+        form = AdminUserForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.set_password("password")
-            user.save()
+            user = form.save()
+            if not user.has_usable_password():
+                user.set_password("password")
+                user.save()
             messages.success(request, "User created (default password: password)")
             return redirect("manage_users")
     else:
-        form = UserForm()
+        form = AdminUserForm()
     users = User.objects.select_related("team").all()
     return render(request, "manage_users.html", {"form": form, "users": users})
 
 
 @login_required
 @staff_required
-def manage_alerts(request):
+def manage_alerts(request, alert_id: int | None = None):
+    alert_instance = Alert.objects.filter(id=alert_id).first() if alert_id else None
     if request.method == "POST":
-        form = AlertForm(request.POST)
+        form = AlertForm(request.POST, instance=alert_instance)
         if form.is_valid():
             alert = form.save(commit=False)
-            alert.created_by = request.user
+            if alert_instance is None:
+                alert.created_by = request.user
             alert.save()
             form.save_m2m()
             messages.success(request, "Alert saved")
@@ -100,9 +109,11 @@ def manage_alerts(request):
                 messages.info(request, f"Delivered to {delivered} users")
             return redirect("manage_alerts")
     else:
-        form = AlertForm()
+        form = AlertForm(instance=alert_instance)
+        if alert_instance:
+            messages.info(request, "Editing existing alert")
     alerts = Alert.objects.all().order_by("-created_at")
-    return render(request, "manage_alerts.html", {"form": form, "alerts": alerts})
+    return render(request, "manage_alerts.html", {"form": form, "alerts": alerts, "editing": alert_instance})
 
 
 @login_required

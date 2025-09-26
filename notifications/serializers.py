@@ -65,6 +65,36 @@ class AlertSerializer(serializers.ModelSerializer):
         return alert
 
 
+class AlertAdminListSerializer(AlertSerializer):
+    is_active_now = serializers.SerializerMethodField()
+    num_preferences = serializers.IntegerField(read_only=True)
+    num_read = serializers.IntegerField(read_only=True)
+    num_unread = serializers.IntegerField(read_only=True)
+    num_snoozed_today = serializers.IntegerField(read_only=True)
+    is_recurring_active = serializers.SerializerMethodField()
+
+    class Meta(AlertSerializer.Meta):
+        fields = AlertSerializer.Meta.fields + [
+            "is_active_now",
+            "num_preferences",
+            "num_read",
+            "num_unread",
+            "num_snoozed_today",
+            "is_recurring_active",
+        ]
+
+    def get_is_active_now(self, obj: Alert) -> bool:
+        return obj.is_active_now
+
+    def get_is_recurring_active(self, obj: Alert) -> bool:
+        # Recurring if: reminders enabled, active window, and there exist users not snoozed today and not read
+        unread = getattr(obj, "num_unread", 0)
+        snoozed = getattr(obj, "num_snoozed_today", 0)
+        total = getattr(obj, "num_preferences", 0)
+        not_snoozed_today = max(total - snoozed, 0)
+        return bool(obj.reminders_enabled and obj.is_active_now and (unread > 0 or not_snoozed_today > 0))
+
+
 class UserAlertPreferenceSerializer(serializers.ModelSerializer):
     alert = AlertSerializer(read_only=True)
 

@@ -1,31 +1,45 @@
 {% extends 'base.html' %}
 {% block title %}Dashboard{% endblock %}
 {% block content %}
-<h2>Your Alerts</h2>
+<div class="d-flex align-items-center mb-3">
+  <h2 class="mb-0"><i class="bi bi-speedometer2 me-2"></i>Your Alerts</h2>
+  <span class="ms-2 badge bg-secondary">{{ preferences|length }}</span>
+</div>
 {% if preferences %}
-  <div class="list-group">
+  <div class="row g-3">
     {% for pref in preferences %}
-      <div class="list-group-item">
-        <div class="d-flex w-100 justify-content-between">
-          <h5 class="mb-1">{{ pref.alert.title }} <span class="badge bg-secondary text-uppercase">{{ pref.alert.severity }}</span></h5>
-          <small>Last reminded: {{ pref.last_reminded_at|default:'—' }}</small>
-        </div>
-        <p class="mb-1">{{ pref.alert.message }}</p>
-        <div>
-          <span class="badge {{ pref.is_read|yesno:'bg-success,bg-warning' }}">{{ pref.is_read|yesno:'Read,Unread' }}</span>
-          {% if pref.snoozed_on %}
-            <span class="badge bg-info">Snoozed on {{ pref.snoozed_on }}</span>
-          {% endif %}
-        </div>
-        <div class="mt-2">
-          <a class="btn btn-sm btn-outline-primary" href="/pref/{{ pref.id }}/toggle-read/">Toggle Read</a>
-          <a class="btn btn-sm btn-outline-secondary" href="/pref/{{ pref.id }}/snooze-today/">Snooze Today</a>
+      <div class="col-md-6">
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-1">
+              <h5 class="card-title mb-0">{{ pref.alert.title }}</h5>
+              {% if pref.alert.severity == 'info' %}
+                <span class="badge badge-info text-uppercase">Info</span>
+              {% elif pref.alert.severity == 'warning' %}
+                <span class="badge badge-warning text-uppercase">Warning</span>
+              {% else %}
+                <span class="badge badge-critical text-uppercase">Critical</span>
+              {% endif %}
+            </div>
+            <p class="card-text">{{ pref.alert.message }}</p>
+            <div class="mb-2">
+              <span class="badge {{ pref.is_read|yesno:'bg-success,bg-warning' }}">{{ pref.is_read|yesno:'Read,Unread' }}</span>
+              {% if pref.snoozed_on %}
+                <span class="badge bg-info">Snoozed on {{ pref.snoozed_on }}</span>
+              {% endif %}
+              <span class="text-muted small ms-2">Last reminded: {{ pref.last_reminded_at|default:'—' }}</span>
+            </div>
+            <div class="d-flex gap-2">
+              <a class="btn btn-sm btn-primary" href="/pref/{{ pref.id }}/toggle-read/"><i class="bi bi-check2-circle me-1"></i>Toggle Read</a>
+              <a class="btn btn-sm btn-outline-secondary" href="/pref/{{ pref.id }}/snooze-today/"><i class="bi bi-alarm me-1"></i>Snooze Today</a>
+            </div>
+          </div>
         </div>
       </div>
     {% endfor %}
   </div>
 {% else %}
-  <div class="alert alert-info">No alerts right now.</div>
+  <div class="alert alert-info shadow-sm"><i class="bi bi-info-circle me-1"></i>No alerts right now.</div>
 {% endif %}
 {% endblock %}
 

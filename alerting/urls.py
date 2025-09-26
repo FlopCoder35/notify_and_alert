@@ -35,8 +35,9 @@ urlpatterns = [
     path('teams/', web_views.manage_teams, name='manage_teams'),
     path('users/', web_views.manage_users, name='manage_users'),
     path('alerts/', web_views.manage_alerts, name='manage_alerts'),
+    path('alerts/<int:alert_id>/', web_views.manage_alerts, name='edit_alert'),
     path('pref/<int:pref_id>/toggle-read/', web_views.toggle_read, name='toggle_read'),
     path('pref/<int:pref_id>/snooze-today/', web_views.snooze_today, name='snooze_today'),
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
-    path('logout/', auth_views.LogoutView.as_view(), name='logout'),
+    path('logout/', web_views.logout_to_home, name='logout'),
 ]

@@ -3,27 +3,77 @@
 {% block content %}
 <div class="row">
   <div class="col-md-5">
-    <div class="card mb-3"><div class="card-body">
-      <h5 class="card-title">Create/Update Alert</h5>
-      <form method="post">{% csrf_token %}{{ form.as_p }}
+    <div class="card mb-3 shadow-sm"><div class="card-body">
+      <h5 class="card-title">{% if editing %}Edit Alert{% else %}Create Alert{% endif %}</h5>
+      <form method="post" class="row g-3">
+        {% csrf_token %}
+        <div class="col-12">
+          <label class="form-label">Title</label>
+          {{ form.title }}
+        </div>
+        <div class="col-12">
+          <label class="form-label">Message</label>
+          {{ form.message }}
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Severity</label>
+          {{ form.severity }}
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Delivery</label>
+          {{ form.delivery_type }}
+        </div>
+        <div class="col-md-4">
+          <label class="form-label">Visibility</label>
+          {{ form.visibility }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Target Teams</label>
+          {{ form.target_teams }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Target Users</label>
+          {{ form.target_users }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Starts</label>
+          {{ form.start_at }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Expires</label>
+          {{ form.expires_at }}
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Reminder Frequency (minutes)</label>
+          {{ form.reminder_frequency_minutes }}
+        </div>
+        <div class="col-md-3 form-check mt-4 ms-2">
+          {{ form.reminders_enabled }} <label class="form-check-label">Reminders Enabled</label>
+        </div>
+        <div class="col-md-3 form-check mt-4">
+          {{ form.archived }} <label class="form-check-label">Archived</label>
+        </div>
         <div class="d-flex gap-2">
-          <button class="btn btn-primary" name="save">Save</button>
-          <button class="btn btn-secondary" name="deliver_now" value="1">Save & Deliver Now</button>
+          <button class="btn btn-primary" name="save"><i class="bi bi-save me-1"></i>Save</button>
+          <button class="btn btn-outline-secondary" name="deliver_now" value="1"><i class="bi bi-send me-1"></i>Save & Deliver Now</button>
         </div>
       </form>
     </div></div>
   </div>
   <div class="col-md-7">
-    <h5>Alerts</h5>
-    <div class="list-group">
+    <h5 class="mb-2">Alerts</h5>
+    <div class="list-group shadow-sm">
       {% for a in alerts %}
         <div class="list-group-item">
           <div class="d-flex justify-content-between">
             <strong>{{ a.title }}</strong>
-            <span class="badge bg-secondary text-uppercase">{{ a.severity }}</span>
+            <span class="badge bg-secondary text-uppercase"><i class="bi bi-flag me-1"></i>{{ a.severity }}</span>
           </div>
           <div>{{ a.message }}</div>
           <small>Visibility: {{ a.visibility }} | Start: {{ a.start_at }} | Expires: {{ a.expires_at|default:'—' }}</small>
+          <div class="mt-2">
+            <a class="btn btn-sm btn-outline-primary" href="/alerts/{{ a.id }}/"><i class="bi bi-pencil-square me-1"></i>Edit</a>
+          </div>
         </div>
       {% empty %}
         <div class="list-group-item">No alerts yet.</div>
