@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %}Manage Users{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-4">
+    <div class="card mb-3"><div class="card-body">
+      <h5 class="card-title">Add User</h5>
+      <form method="post">{% csrf_token %}{{ form.as_p }}<button class="btn btn-primary">Create</button></form>
+      <small class="text-muted">Default password: password</small>
+    </div></div>
+  </div>
+  <div class="col-md-8">
+    <h5>Users</h5>
+    <table class="table table-striped">
+      <thead><tr><th>Username</th><th>Email</th><th>Team</th><th>Staff</th></tr></thead>
+      <tbody>
+        {% for u in users %}
+          <tr><td>{{ u.username }}</td><td>{{ u.email }}</td><td>{{ u.team|default:'—' }}</td><td>{{ u.is_staff|yesno:'Yes,No' }}</td></tr>
+        {% empty %}
+          <tr><td colspan="4">No users yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+

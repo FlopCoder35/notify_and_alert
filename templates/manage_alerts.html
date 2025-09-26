@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block title %}Manage Alerts{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-md-5">
+    <div class="card mb-3"><div class="card-body">
+      <h5 class="card-title">Create/Update Alert</h5>
+      <form method="post">{% csrf_token %}{{ form.as_p }}
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary" name="save">Save</button>
+          <button class="btn btn-secondary" name="deliver_now" value="1">Save & Deliver Now</button>
+        </div>
+      </form>
+    </div></div>
+  </div>
+  <div class="col-md-7">
+    <h5>Alerts</h5>
+    <div class="list-group">
+      {% for a in alerts %}
+        <div class="list-group-item">
+          <div class="d-flex justify-content-between">
+            <strong>{{ a.title }}</strong>
+            <span class="badge bg-secondary text-uppercase">{{ a.severity }}</span>
+          </div>
+          <div>{{ a.message }}</div>
+          <small>Visibility: {{ a.visibility }} | Start: {{ a.start_at }} | Expires: {{ a.expires_at|default:'—' }}</small>
+        </div>
+      {% empty %}
+        <div class="list-group-item">No alerts yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+

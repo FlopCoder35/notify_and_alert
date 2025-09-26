@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h2>Your Alerts</h2>
+{% if preferences %}
+  <div class="list-group">
+    {% for pref in preferences %}
+      <div class="list-group-item">
+        <div class="d-flex w-100 justify-content-between">
+          <h5 class="mb-1">{{ pref.alert.title }} <span class="badge bg-secondary text-uppercase">{{ pref.alert.severity }}</span></h5>
+          <small>Last reminded: {{ pref.last_reminded_at|default:'—' }}</small>
+        </div>
+        <p class="mb-1">{{ pref.alert.message }}</p>
+        <div>
+          <span class="badge {{ pref.is_read|yesno:'bg-success,bg-warning' }}">{{ pref.is_read|yesno:'Read,Unread' }}</span>
+          {% if pref.snoozed_on %}
+            <span class="badge bg-info">Snoozed on {{ pref.snoozed_on }}</span>
+          {% endif %}
+        </div>
+        <div class="mt-2">
+          <a class="btn btn-sm btn-outline-primary" href="/pref/{{ pref.id }}/toggle-read/">Toggle Read</a>
+          <a class="btn btn-sm btn-outline-secondary" href="/pref/{{ pref.id }}/snooze-today/">Snooze Today</a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <div class="alert alert-info">No alerts right now.</div>
+{% endif %}
+{% endblock %}
+
+
